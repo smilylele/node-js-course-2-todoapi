@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start" : "node server/server.js",
     "test": "mocha server/**/*.test.js",
     "test-watch": "nodemon --exec \"npm test\""
   },
   "author": "",
+  "engine": {
+    "node" : "6.11.3"
+  }
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -23,3 +27,5 @@
     "supertest": "^3.0.0"
   }
 }
+//my heroku uri for this folder, 20171126 09:46:17
+//mongodb://heroku_0crv1lmc:f71m5m558a928vcd5jd14dcfqr@ds121686.mlab.com:21686/heroku_0crv1lmc
