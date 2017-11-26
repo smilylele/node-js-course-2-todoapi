@@ -27,5 +27,3 @@
     "supertest": "^3.0.0"
   }
 }
-//my heroku uri for this folder, 20171126 09:46:17
-//mongodb://heroku_0crv1lmc:f71m5m558a928vcd5jd14dcfqr@ds121686.mlab.com:21686/heroku_0crv1lmc
