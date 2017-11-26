@@ -3,9 +3,13 @@ const request = require("supertest")
 
 const {app} = require("./../server");
 const {Todo} = require("./../models/todo");
+const {ObjectID} = require("mongodb")
+
 const todos = [{
+    _id : new ObjectID(),
   text : "firt test todo"
 }, {
+    _id : new ObjectID(),
   text : "second test todo"
 }]
 
@@ -66,6 +70,42 @@ describe("GET /todos", () => {
       expect(res.body.result.length).toBe(2)
     })
     .end(done);
-
     });
   });
+
+describe("GET /todos/:id", () => {
+    it("should get the specific todo document", (done) => {
+        request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.result.text).toBe(todos[0].text);
+        })
+        .end(done);
+    })
+
+    it("should return 404 if to do not found", (done) => {
+        var changed_id = todos[0]._id.toHexString().replace("a", "e")
+      request(app)
+      .get(`/todos/${changed_id}`)
+      .expect(404)
+      .end(done);
+    })
+
+    // it("should return 404 if the id is not valid", (done) => {
+    //     var changed_id = todos[0]._id.toHexString().replace("a", "e")
+    //     request(app)
+    //     .get(`/todos/${changed_id}`)
+    //     .expect(404)
+    //     .end(done)
+    // })
+
+
+    it("should return 404 again", (done) => {
+        var changed_id = todos[0]._id.toHexString().replace("a", "e")
+      request(app)
+      .get(`/todos/123`)
+      .expect(404)
+      .end(done);
+    })
+})
