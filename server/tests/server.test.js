@@ -109,3 +109,32 @@ describe("GET /todos/:id", () => {
       .end(done);
     })
 })
+
+describe("DELETE /todos/:id", () => {
+    it("Should remove one doc", (done) => {
+        request(app)
+        .delete(`/todos/${todos[0]._id}`)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.result.text).toBe("firt test todo")
+        })
+        .end(done);
+    })
+
+    it("Should return 404 with invalid id", (done) => {
+        request(app)
+        .delete("/todos/djfkdfjdk")
+        .expect(404)
+        .end(done)
+    });
+
+    it("Should return 400 if not found", (done) => {
+        var changed_id = todos[0]._id.toHexString().replace("a", "e")
+        request(app)
+        .delete(`/todos/${changed_id}`)
+        .expect(404)
+        .end(done)
+    })
+})
+// When to use the done
+
