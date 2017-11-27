@@ -7,10 +7,14 @@ const {ObjectID} = require("mongodb")
 
 const todos = [{
     _id : new ObjectID(),
-  text : "firt test todo"
+  text : "firt test todo",
+  completed : true,
+  completedAt: 34343
 }, {
     _id : new ObjectID(),
-  text : "second test todo"
+  text : "second test todo",
+  completed : false,
+  completedAt : null
 }]
 
 beforeEach((done) => {
@@ -136,5 +140,40 @@ describe("DELETE /todos/:id", () => {
         .end(done)
     })
 })
-// When to use the done
+// When to use the done, 20171127 19:59:02
 
+describe("Patch /todos/id", () => {
+    it("Should patch a doc successfully", (done) => {
+        var second_id = todos[1]._id.toHexString();
+        var newtext = "This should be new one";
+
+        request(app)
+        .patch(`/todos/${second_id}`)
+        .send({
+            completed : true,
+            text : newtext
+        })
+        .expect(200)
+        .expect((result) =>{
+            expect(result.body.text).toBe(newtext)
+            expect(typeof result.body.completedAt).toBe("number")
+        })
+        .end(done)
+    })
+
+    it("Should clear completedAt when todo is not completed", (done) => {
+        var first_id = todos[0]._id.toHexString();
+
+        request(app)
+        .patch(`/todos/${first_id}`)
+        .send({
+            completed : false
+        })
+        .expect(200)
+        .expect((result) => {
+            expect(result.body.completed).toBeFalsy()
+            expect(result.body.completedAt).toBeNull()
+        })
+        .end(done)
+    })
+})
