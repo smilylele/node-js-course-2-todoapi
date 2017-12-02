@@ -2,6 +2,7 @@ var mongoose = require("mongoose");
 var validator = require("validator");
 const jwt = require("jsonwebtoken");
 const _ = require("lodash");
+const bcrpyt = require("bcryptjs");
 
 var UserSchema = new mongoose.Schema({
     email : {
@@ -73,6 +74,26 @@ UserSchema.statics.findByToken = function (token) {
         "tokens.access" : "auth"
     })
 }
+
+// Why put the middleware here?
+UserSchema.pre("save", function (next) {
+    var user = this;
+
+    if (user.isModified()) { // user.isModified? how you can know they are isModified?
+        // after reading some questions answers, I get this:
+            // ismodiefied is check if the data has been changed since the data was fectched for the database
+            // but for a new instance, the isModified will always return "True"
+        // But in this video, I stll can't see the sense of user.isModified with all the explanations!
+        bcrpyt.genSalt(10, (err, salt) => {
+            bcrpyt.hash(user.password, salt, (err, hash) => {
+                user.password = hash;// if we have a wrong password, it will change my password in the database?
+                next();
+            })
+        })
+    } else {
+        next();
+    }
+} )
 
 var User = mongoose.model("users", UserSchema);
 module.exports = {User};
