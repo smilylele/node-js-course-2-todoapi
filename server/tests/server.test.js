@@ -4,24 +4,13 @@ const request = require("supertest")
 const {app} = require("./../server");
 const {Todo} = require("./../models/todo");
 const {ObjectID} = require("mongodb")
+const {User} = require("./../models/user")
 
-const todos = [{
-    _id : new ObjectID(),
-  text : "firt test todo",
-  completed : true,
-  completedAt: 34343
-}, {
-    _id : new ObjectID(),
-  text : "second test todo",
-  completed : false,
-  completedAt : null
-}]
+const {todos, populateTodos, users, populateUsers} = require("./seed/seed.js")
 
-beforeEach((done) => {
-  Todo.remove({}).then(() => {
-    return Todo.insertMany(todos);
-  }).then(() => done());
-});
+//beforeEach means do this function before every test
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe("POST /todos", () => {
     it("should create a new todo", (done) => {
@@ -176,4 +165,82 @@ describe("Patch /todos/id", () => {
         })
         .end(done)
     })
+})
+
+
+describe("GET /users/me", () => {
+    it("should return user if authenticated", (done) => {
+        request(app)
+        .get("/users/me")
+        .set("x-auth", users[0].tokens[0].token)
+        .expect(200)
+        .expect((res) => {
+            expect(res.body._id).toBe(users[0]._id.toHexString());
+            expect(res.body.email).toBe(users[0].email);
+        })
+        .end(done);
+    })
+
+    it("should return 401 if authenticated", (done) => {
+        request(app)
+        .get("/users/me")
+        .set("x-auth", "this is just a joke")
+        .expect(401)
+        .expect((res) => {
+            expect(res.body).toEqual({});
+        })
+        .end(done);
+    })
+});
+
+describe("POST /users", () => {
+    it("should create a user", (done) => {
+        var email = "lele@163.com";
+        var password = "3647867";
+
+        request(app)
+        .post("/users")
+        .send({email, password})
+        .expect(200)
+        .expect((res) => {
+            expect(res.headers["x-auth"]).toBeDefined();
+            expect(res.body.email).toBe(email);
+            expect(res.body._id).toBeDefined();
+        }).end((err) => {
+            if (err) {
+                return done(err);
+            }
+
+            User.findOne({email}).then((user) => {
+                expect(user).toBeDefined();
+                expect(user.password).not.toEqual(password);
+                done();
+            })
+        })
+
+    });
+
+    it("should return validation errors if request invalid", (done) => {
+        var password = "343"
+        request(app)
+        .post("/users")
+        .send({email : "nothing", password})
+        .expect(400)
+        .expect((res) => {
+            expect(res.body.errors.email).toBeDefined();
+            expect(res.body.errors.password.kind).toBe("minlength");
+        }).end(done);
+    });
+
+    it("should not create user email in use", (done) => {
+        var password = "34934934034";
+        request(app)
+        .post("/users")
+        .send({email : users[0].email, password})
+        .expect((res) => {
+            expect(res.body.code).toBe(11000);
+        }).end(done)
+    })
+
+
 })
