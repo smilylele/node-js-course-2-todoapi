@@ -18,6 +18,7 @@ const {mongoose} =  require("./db/mongoose.js");
 const {Todo} = require("./models/todo.js");
 const {User} = require("./models/user.js");
 const {ObjectID} = require("mongodb")
+var {authenticate} = require("./middleware/authenticate")
 
 var app = express();
 const port = process.env.PORT;
@@ -120,7 +121,8 @@ app.patch("/todos/:id", (req, res) => {
 
 
 app.post("/users", (req, res) => {
-    user = new User(_.pick(req.body, ["email", "password"]));
+    var body = _.pick(req.body, ["email", "password"]);
+    var user = new User(body);
 
     user.save().then(() => {
         return user.generateAuthToken();
@@ -130,6 +132,13 @@ app.post("/users", (req, res) => {
         res.status(400).send(e);
     })
 })
+
+// refer to "http://expressjs.com/en/guide/routing.html" for the Route Handler
+// There are three ways to do this, or combination of them
+app.get("/users/me", authenticate, (req, res) => {
+    res.status(200).send(req.user)
+})
+
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
