@@ -75,18 +75,42 @@ UserSchema.statics.findByToken = function (token) {
     })
 }
 
+UserSchema.statics.findByCredentials = function(email, password){
+    var User = this;
+
+    return User.findOne({email}).then((user) => {
+        if (!user) {
+            return Promise.reject();
+        }
+
+        return new Promise((resolve, reject) => {
+            bcrpyt.compare(password, user.password, (err, res) => {
+                if (res) {
+                    return resolve(user);
+                } else {
+                    return reject();
+                }
+            })
+        })
+    })
+}
+
 // Why put the middleware here?
 UserSchema.pre("save", function (next) {
     var user = this;
 
-    if (user.isModified()) { // user.isModified? how you can know they are isModified?
+    if (user.isModified("password")) { // user.isModified? how you can know they are isModified?
         // after reading some questions answers, I get this:
             // ismodiefied is check if the data has been changed since the data was fectched for the database
             // but for a new instance, the isModified will always return "True"
         // But in this video, I stll can't see the sense of user.isModified with all the explanations!
         bcrpyt.genSalt(10, (err, salt) => {
             bcrpyt.hash(user.password, salt, (err, hash) => {
+                // var oldpassword = user.password
                 user.password = hash;// if we have a wrong password, it will change my password in the database?
+                // bcrpyt.compare(oldpassword, user.password, (err, res) => {
+                //     console.log("yes");
+                // })
                 next();
             })
         })
