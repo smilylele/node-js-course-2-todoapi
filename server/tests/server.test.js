@@ -276,3 +276,22 @@ describe("Test POST /users/login", () => {
         .end(done)
     })
 })
+
+describe("Test DELETE /users/login/token", () => {
+    it("should remove all the token", (done) => {
+        request(app)
+        .delete("/users/me/token")
+        .set("x-auth", users[0].tokens[0].token) // why use set here
+        .expect(200)
+        .end((err, result) => {
+            if (err) {
+                return done(err);
+            }
+
+            User.findById(users[0]._id).then((user) => {
+                expect(user.tokens.length).toBe(0)
+                done();
+            }).catch((e) => done(e))
+        })
+    })
+})
