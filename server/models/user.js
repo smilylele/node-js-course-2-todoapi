@@ -95,6 +95,19 @@ UserSchema.statics.findByCredentials = function(email, password){
     })
 }
 
+UserSchema.methods.removetoken = function (token) {
+    var user = this;
+    var decoded;
+
+    return user.update({
+        $pull : {
+            tokens: {
+                token: token
+            }
+        }
+    })
+};
+
 // Why put the middleware here?
 UserSchema.pre("save", function (next) {
     var user = this;

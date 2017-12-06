@@ -241,6 +241,38 @@ describe("POST /users", () => {
             expect(res.body.code).toBe(11000);
         }).end(done)
     })
+});
 
+describe("Test POST /users/login", () => {
+    it("should return the user value", (done) => {
+        request(app)
+        .post("/users/login")
+        .send({email : users[0].email, password : users[0].password})
+        .expect(200)
+        .expect((res) => {
+            // expect(res.body.email).toBe(users[0].email);
+            expect(res.headers["x-auth"]).toBeDefined();
+        }).end((err, res) => {
+            if (err) {
+                return done(err)
+            }
 
+            User.findById(users[0]._id).then((user) => {
+                expect(user[0].tokens).toContain({
+                    access : "auth",
+                    token : res.headers["x-auth"]
+                })
+            })
+
+            done();
+        })
+    })
+
+    it("should return nothing for a wrong password", (done) => {
+        request(app)
+        .post("/users/login")
+        .send({email : users[0].email, password : "nothingpossible"})
+        .expect(400)
+        .end(done)
+    })
 })
