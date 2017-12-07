@@ -27,12 +27,14 @@ const todos = [{
     _id : new ObjectID(),
   text : "firt test todo",
   completed : true,
-  completedAt: 34343
+  completedAt: 34343,
+  _creator : userOneId
 }, {
     _id : new ObjectID(),
   text : "second test todo",
   completed : false,
-  completedAt : null
+  completedAt : null,
+  _creator : userSecondId
 }];
 
 //beforeEach means do this function before every test
