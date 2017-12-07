@@ -11,7 +11,7 @@ const users = [{
   password : "JustFirstPwd",
   tokens: [{
     access: "auth",
-    token: jwt.sign({_id : userOneId, access : "auth"}, "abc123").toString()
+    token: jwt.sign({_id : userOneId, access : "auth"}, process.env.JWT_SECRET).toString()
   }]
 }, {
   _id : userSecondId,
@@ -19,7 +19,7 @@ const users = [{
   password : "JustSecondPwd",
   tokens:[{
     access: "auth",
-    token: jwt.sign({_id: userSecondId, access: "auth"}, "abc123").toString()
+    token: jwt.sign({_id: userSecondId, access: "auth"}, process.env.JWT_SECRET).toString()
   }]
 }]
 

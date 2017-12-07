@@ -2,7 +2,7 @@ const {SHA256} = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const bcrpyt = require("bcryptjs");
 
-var password = "123abc!";
+var password = "374837943794dkfhksj";
 bcrpyt.genSalt(10, (err, salt) => {
     bcrpyt.hash(password, salt, (err, hash) => {
         console.log(hash);
@@ -10,7 +10,7 @@ bcrpyt.genSalt(10, (err, salt) => {
 })
 
 var pw1 = "$2a$10$c7fvAjblfOv3CXtBnN0FCexHNAiZwNANFRk66yqatPQB7iEXMToY2"
-var pw2 = "$2a$10$rY5uF1cB2F6WglSqXHwd4uLr/dY/vV3r/l7anbu3JbDixNbnvCaUu"
+var pw2 = "$2a$10$RJ9u2KqMC14nJox6Z6an3OvQmoegMy3RUi62qtg2pVNA.Y/shNHp."
 
 bcrpyt.compare(password, pw2, (err, res) => {
     console.log(res);
